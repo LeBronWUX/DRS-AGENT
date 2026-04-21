@@ -1,0 +1,29 @@
+# Build
+target/
+*.jar
+*.class
+
+# Logs
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.swp
+
+# Node (for frontend embedded)
+node_modules/
+
+# Frontend build (embedded in jar)
+src/main/resources/frontend/
+
+# Test
+test-output/

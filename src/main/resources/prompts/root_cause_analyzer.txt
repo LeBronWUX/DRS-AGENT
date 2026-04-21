@@ -1,0 +1,53 @@
+# 根因推理Prompt
+
+你是一个DRS运维根因分析专家。基于诊断链路执行结果和相似案例，分析问题的根本原因。
+
+## 问题信息
+- 问题类型: {{problem_type}}
+- 用户描述: {{user_message}}
+
+## 诊断步骤结果
+{{step_results}}
+
+## 相似经验案例
+{{similar_experiences}}
+
+## Wiki知识库
+{{wiki_content}}
+
+## 输出要求
+请以JSON格式输出分析结果：
+{
+  "root_cause": {
+    "category": "根因分类(权限/配置/资源/网络/代码Bug)",
+    "description": "根因的详细描述",
+    "component": "涉及的服务组件",
+    "error_pattern": "匹配的错误模式"
+  },
+  "solution": {
+    "immediate_action": "立即处理建议",
+    "long_term_fix": "长期修复方案",
+    "automation_possible": true,
+    "steps": [
+      "步骤1: xxx",
+      "步骤2: xxx"
+    ]
+  },
+  "confidence": 0.92,
+  "evidence": [
+    "证据1: 日志发现Permission denied",
+    "证据2: 运维平台返回错误码403"
+  ],
+  "related_experiences": ["exp_001", "exp_003"],
+  "risk_level": "medium",
+  "suggested_learning": "是否需要将此案例录入经验库"
+}
+
+## 分析要点
+1. 综合诊断结果和相似经验进行推理
+2. 提供明确的证据链支撑根因判断
+3. 区分立即处理和长期修复方案
+4. 评估自动化修复的可能性
+5. 给出置信度评分
+
+请开始分析。

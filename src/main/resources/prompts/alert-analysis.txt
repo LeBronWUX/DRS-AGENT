@@ -1,0 +1,12 @@
+# Alert Analysis Prompt
+
+Analyze the following alert data and provide:
+1. Root cause analysis
+2. Impact assessment
+3. Recommended actions
+4. Prevention suggestions
+
+Alert Data:
+{{alert_data}}
+
+Please provide a comprehensive analysis in Chinese.

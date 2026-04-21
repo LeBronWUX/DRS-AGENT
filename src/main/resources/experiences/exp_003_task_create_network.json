@@ -1,0 +1,85 @@
+{
+  "id": "exp_003",
+  "problem_type": "任务创建失败",
+  "keywords": ["create", "failed", "timeout", "network", "connection", "网络超时"],
+  "summary": "任务创建因网络超时失败",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "查询运维平台获取任务信息",
+      "tool": "query_ops_platform",
+      "params": {"workflowId": "${workflowId}"},
+      "key_outputs": ["status", "errorCode", "retryCount"]
+    },
+    {
+      "step": 2,
+      "action": "检查drs-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR", "timeout", "connection", "refused"]
+      }
+    },
+    {
+      "step": 3,
+      "action": "检查网络配置文档",
+      "tool": "search_wiki",
+      "params": {"keywords": ["网络配置", "防火墙", "安全组"]}
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Connection timeout",
+      "regex": "Connection.*timeout|连接超时",
+      "cause": "目标服务响应超时",
+      "solution": "检查目标服务状态，增加超时时间配置，检查网络链路",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Connection refused",
+      "regex": "Connection.*refused|连接被拒绝",
+      "cause": "目标服务不可用或端口未开放",
+      "solution": "确认目标服务运行状态，检查端口配置和安全组规则",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Network unreachable",
+      "regex": "Network.*unreachable|网络不可达",
+      "cause": "网络路由配置错误",
+      "solution": "检查VPC路由表配置，确认网络连通性",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "SSL handshake failed",
+      "regex": "SSL.*handshake.*failed|SSL握手失败",
+      "cause": "SSL证书配置问题",
+      "solution": "检查证书有效期和配置，更新过期证书",
+      "frequency": "low"
+    },
+    {
+      "pattern": "DNS resolution failed",
+      "regex": "DNS.*resolution.*failed|DNS解析失败",
+      "cause": "DNS解析异常",
+      "solution": "检查DNS配置，尝试使用IP地址直连",
+      "frequency": "medium"
+    }
+  ],
+  "success_rate": 0.88,
+  "applicable_scenarios": [
+    "任务创建失败且日志包含网络相关错误",
+    "连接超时或连接被拒绝的场景"
+  ],
+  "expert_tips": [
+    "网络问题可能是临时的，建议先重试",
+    "检查目标服务的健康状态和负载情况",
+    "关注防火墙和安全组配置变更",
+    "跨Region场景需要特别注意网络延迟"
+  ],
+  "metadata": {
+    "source": "expert_网络工程师",
+    "created_at": "2026-04-20",
+    "last_updated": "2026-04-20",
+    "version": "1.0"
+  }
+}

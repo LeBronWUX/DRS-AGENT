@@ -1,0 +1,78 @@
+{
+  "id": "exp_002",
+  "problem_type": "任务创建失败",
+  "keywords": ["create", "failed", "quota", "exceeded", "limit", "资源配额"],
+  "summary": "任务创建因资源配额超限失败",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "查询运维平台获取任务信息",
+      "tool": "query_ops_platform",
+      "params": {"workflowId": "${workflowId}"},
+      "key_outputs": ["status", "errorCode", "resourceType"]
+    },
+    {
+      "step": 2,
+      "action": "检查drs-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR", "Quota", "exceeded", "limit"]
+      }
+    },
+    {
+      "step": 3,
+      "action": "查询配额配置文档",
+      "tool": "search_wiki",
+      "params": {"keywords": ["配额申请", "扩容流程"]}
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Quota exceeded",
+      "regex": "Quota exceeded.*instance|配额超限",
+      "cause": "实例数量配额超限",
+      "solution": "申请扩容实例配额，或清理无用实例释放配额",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Storage quota exceeded",
+      "regex": "Storage.*quota.*exceeded|存储配额超限",
+      "cause": "存储配额超限",
+      "solution": "清理无用数据释放存储空间，或申请扩容存储配额",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "CPU quota exceeded",
+      "regex": "CPU.*quota.*exceeded|CPU配额超限",
+      "cause": "CPU资源配额超限",
+      "solution": "释放闲置资源或申请提升CPU配额限制",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "Memory quota exceeded",
+      "regex": "Memory.*quota.*exceeded|内存配额超限",
+      "cause": "内存资源配额超限",
+      "solution": "优化内存使用或申请提升内存配额限制",
+      "frequency": "low"
+    }
+  ],
+  "success_rate": 0.92,
+  "applicable_scenarios": [
+    "任务创建失败且错误信息包含quota或配额关键字",
+    "资源创建操作失败提示超限"
+  ],
+  "expert_tips": [
+    "先确认是哪种资源类型的配额超限",
+    "检查是否有无用资源可以释放",
+    "配额申请通常需要审批，提前规划",
+    "关注配额使用趋势，提前预警"
+  ],
+  "metadata": {
+    "source": "expert_资源管理员",
+    "created_at": "2026-04-20",
+    "last_updated": "2026-04-20",
+    "version": "1.0"
+  }
+}

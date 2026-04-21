@@ -1,0 +1,68 @@
+{
+  "id": "exp_001",
+  "problem_type": "任务创建失败",
+  "keywords": ["create", "failed", "permission", "workflow", "403"],
+  "summary": "任务创建因权限不足失败",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "查询运维平台获取任务信息",
+      "tool": "query_ops_platform",
+      "params": {"workflowId": "${workflowId}"},
+      "key_outputs": ["status", "errorCode", "traceId"]
+    },
+    {
+      "step": 2,
+      "action": "检查drs-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR", "Permission", "denied"]
+      }
+    },
+    {
+      "step": 3,
+      "action": "检查账号权限配置",
+      "tool": "search_wiki",
+      "params": {"keywords": ["权限配置", "VPC访问"]}
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Permission denied",
+      "regex": "Permission denied.*VPC|403.*Forbidden",
+      "cause": "账号缺少VPC访问权限",
+      "solution": "检查账号权限配置，确保具有VPC访问权限，联系管理员添加权限",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Access denied",
+      "regex": "Access denied.*resource",
+      "cause": "账号缺少资源访问权限",
+      "solution": "检查账号是否有对应资源的访问权限，确认资源策略配置正确",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "Insufficient privileges",
+      "regex": "Insufficient privileges.*operation",
+      "cause": "账号权限级别不足",
+      "solution": "联系管理员提升账号权限级别或使用具有足够权限的账号",
+      "frequency": "low"
+    }
+  ],
+  "success_rate": 0.95,
+  "applicable_scenarios": ["所有任务创建失败且日志包含权限错误"],
+  "expert_tips": [
+    "优先检查日志中的Permission denied关键字",
+    "注意错误码403表示权限问题",
+    "检查用户所属用户组权限配置",
+    "确认资源策略是否限制访问"
+  ],
+  "metadata": {
+    "source": "expert_系统管理员",
+    "created_at": "2026-04-20",
+    "last_updated": "2026-04-20",
+    "version": "1.0"
+  }
+}

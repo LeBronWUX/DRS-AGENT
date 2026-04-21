@@ -1,0 +1,115 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: drs-agent-backend
+
+  # MySQL Configuration
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:drs_agent}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:root123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      pool-name: DrsAgentHikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: ${SHOW_SQL:false}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # SQL Initialization
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+
+# Milvus Configuration
+milvus:
+  host: ${MILVUS_HOST:localhost}
+  port: ${MILVUS_PORT:19530}
+  database: ${MILVUS_DATABASE:default}
+  connect-timeout: 10000
+  keep-alive-time: 60000
+
+# Anthropic Claude API Configuration
+anthropic:
+  api:
+    key: ${ANTHROPIC_API_KEY:}
+  model: ${CLAUDE_MODEL:claude-sonnet-4-6}
+  timeout: ${CLAUDE_TIMEOUT:120}
+  max-retries: ${CLAUDE_MAX_RETRIES:3}
+  max-tokens: ${CLAUDE_MAX_TOKENS:4096}
+
+# Operations Platform API Configuration
+ops-platform:
+  base-url: ${OPS_PLATFORM_URL:http://localhost:9090}
+  api-key: ${OPS_API_KEY:}
+  timeout: ${OPS_TIMEOUT:30000}
+
+# MCP Configuration
+mcp:
+  enabled: true
+  tools-package: com.drs.agent.mcp
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.drs.agent: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# WeLink Configuration
+welink:
+  app-id: ${WELINK_APP_ID:}
+  app-secret: ${WELINK_APP_SECRET:}
+  webhook-url: ${WELINK_WEBHOOK_URL:}
+  push-group-id: ${WELINK_PUSH_GROUP_ID:}
+  enabled: ${WELINK_ENABLED:false}
+
+# Auto-Diagnosis Configuration
+auto-diagnosis:
+  enabled: ${AUTO_DIAGNOSIS_ENABLED:true}
+  minimum-severity: ${AUTO_DIAGNOSIS_MIN_SEVERITY:HIGH}
+  supported-alert-types: 任务创建失败,鉴权失败,再编辑丢失对象,增量同步失败,全量迁移失败

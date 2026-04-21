@@ -1,0 +1,99 @@
+# 本机独立启动配置 (无需MySQL/Redis/Milvus)
+# 使用H2内存数据库，禁用外部依赖
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: drs-agent-backend
+
+  # 使用H2内存数据库
+  datasource:
+    url: jdbc:h2:mem:drs_agent;DB_CLOSE_DELAY=-1;MODE=MySQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # H2控制台(开发用)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA配置 - 自动创建表
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  # 禁用Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # 禁用SQL初始化
+  sql:
+    init:
+      mode: never
+
+# 禁用Milvus
+milvus:
+  enabled: false
+  host: localhost
+  port: 19530
+
+# Claude API配置 (需要填入真实API Key)
+anthropic:
+  api:
+    key: ${ANTHROPIC_API_KEY:}
+  model: claude-sonnet-4-6
+  timeout: 120
+  max-retries: 3
+  max-tokens: 4096
+
+# 禁用运维平台
+ops-platform:
+  base-url: http://localhost:9090
+  api-key:
+
+# MCP配置
+mcp:
+  enabled: true
+  tools-package: com.drs.agent.mcp
+
+# WeLink配置
+welink:
+  enabled: false
+  app-id:
+  app-secret:
+
+# 自动诊断配置
+auto-diagnosis:
+  enabled: false
+
+# 经验初始化配置
+experience:
+  init-on-startup: true
+  overwrite-existing: false
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.drs.agent: DEBUG
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,h2-console
+  endpoint:
+    health:
+      show-details: always

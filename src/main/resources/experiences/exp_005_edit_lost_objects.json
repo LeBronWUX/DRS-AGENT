@@ -1,0 +1,104 @@
+{
+  "id": "exp_005",
+  "problem_type": "再编辑丢失对象",
+  "keywords": ["edit", "lost", "object", "missing", "数据丢失", "编辑"],
+  "summary": "再编辑任务过程中数据对象丢失",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "查询运维平台获取任务信息",
+      "tool": "query_ops_platform",
+      "params": {"workflowId": "${workflowId}"},
+      "key_outputs": ["taskType", "status", "objectCount", "sourceConfig"]
+    },
+    {
+      "step": 2,
+      "action": "检查drs-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR", "object", "lost", "missing", "delete"]
+      }
+    },
+    {
+      "step": 3,
+      "action": "检查drs-sync日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-sync",
+        "traceId": "${traceId}",
+        "keywords": ["WARN", "object", "skip", "filter"]
+      }
+    },
+    {
+      "step": 4,
+      "action": "查询数据同步配置文档",
+      "tool": "search_wiki",
+      "params": {"keywords": ["对象过滤规则", "数据同步配置", "编辑模式"]}
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Object filtered",
+      "regex": "Object.*filtered|对象.*被过滤|filter rule matched",
+      "cause": "对象被同步过滤规则过滤掉",
+      "solution": "检查对象过滤规则配置，确认是否需要调整过滤条件",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Object type not supported",
+      "regex": "Object.*type.*not.*supported|对象类型不支持",
+      "cause": "对象类型不在同步支持列表内",
+      "solution": "检查同步任务的对象类型配置，联系开发确认支持范围",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "Conflict resolution",
+      "regex": "Conflict.*resolution|冲突解决|version conflict",
+      "cause": "编辑冲突导致对象被覆盖",
+      "solution": "检查冲突解决策略配置，建议启用版本控制或合并策略",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "Cascade delete",
+      "regex": "Cascade.*delete|级联删除|dependency removed",
+      "cause": "关联对象删除导致级联删除",
+      "solution": "检查对象的依赖关系，确认级联删除规则是否符合预期",
+      "frequency": "low"
+    },
+    {
+      "pattern": "Source object missing",
+      "regex": "Source.*object.*missing|源对象不存在",
+      "cause": "源端对象已被删除或不可访问",
+      "solution": "检查源端对象状态，确认对象是否真实存在",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Sync mode mismatch",
+      "regex": "Sync.*mode.*mismatch|同步模式不匹配",
+      "cause": "编辑模式与同步任务配置不匹配",
+      "solution": "确认同步任务配置的编辑模式是否正确",
+      "frequency": "medium"
+    }
+  ],
+  "success_rate": 0.86,
+  "applicable_scenarios": [
+    "再编辑任务完成后发现对象丢失",
+    "数据同步过程中对象被意外删除",
+    "编辑操作后数据不一致"
+  ],
+  "expert_tips": [
+    "优先检查源端对象是否存在",
+    "关注对象过滤规则配置",
+    "检查是否存在编辑冲突",
+    "确认同步任务的对象类型配置",
+    "建议开启变更日志便于追溯"
+  ],
+  "metadata": {
+    "source": "expert_数据迁移专家",
+    "created_at": "2026-04-20",
+    "last_updated": "2026-04-20",
+    "version": "1.0"
+  }
+}

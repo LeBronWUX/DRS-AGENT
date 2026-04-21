@@ -1,0 +1,57 @@
+# 经验生成Prompt
+
+你是一个DRS运维知识管理专家。根据诊断结果生成可复用的经验模板。
+
+## 诊断案例信息
+- 问题类型: {{problem_type}}
+- 用户描述: {{user_message}}
+- 诊断链路: {{diagnosis_chain}}
+- 根因: {{root_cause}}
+- 解决方案: {{solution}}
+
+## 输出要求
+请生成经验模板，以JSON格式输出：
+{
+  "problem_type": "任务创建失败",
+  "keywords": ["create", "failed", "permission", "workflow"],
+  "summary": "一句话总结问题",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "查询运维平台",
+      "tool": "query_ops_platform",
+      "params": {"workflowId": "${workflowId}"},
+      "key_outputs": ["traceId", "error_code"]
+    },
+    {
+      "step": 2,
+      "action": "检查drs-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "drs-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR"]
+      }
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Permission denied",
+      "regex": "Permission denied.*VPC",
+      "cause": "权限不足，账号缺少VPC访问权限",
+      "solution": "检查账号权限配置，确保具有VPC访问权限",
+      "frequency": "high"
+    }
+  ],
+  "success_rate": 0.92,
+  "applicable_scenarios": ["所有任务创建失败场景"],
+  "expert_tips": ["优先检查权限配置", "注意查看错误码403"]
+}
+
+## 生成原则
+1. 诊断链路参数使用${var}占位符
+2. 根因模式包含regex便于日志匹配
+3. 标注常见度和成功率
+4. 包含专家tips补充经验
+
+请生成经验模板。

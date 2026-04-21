@@ -1,0 +1,93 @@
+{
+  "id": "exp_004",
+  "problem_type": "鉴权失败",
+  "keywords": ["auth", "failed", "token", "expired", "invalid", "认证", "鉴权"],
+  "summary": "用户鉴权失败导致操作被拒绝",
+  "diagnosis_chain": [
+    {
+      "step": 1,
+      "action": "获取告警上下文信息",
+      "tool": "get_alert_context",
+      "params": {"alertId": "${alertId}"},
+      "key_outputs": ["userId", "authMethod", "timestamp"]
+    },
+    {
+      "step": 2,
+      "action": "检查auth-service日志",
+      "tool": "query_logs",
+      "params": {
+        "service": "auth-service",
+        "traceId": "${traceId}",
+        "keywords": ["ERROR", "auth", "token", "failed"]
+      }
+    },
+    {
+      "step": 3,
+      "action": "查询鉴权配置文档",
+      "tool": "search_wiki",
+      "params": {"keywords": ["鉴权配置", "Token管理", "IAM"]}
+    }
+  ],
+  "root_causes": [
+    {
+      "pattern": "Token expired",
+      "regex": "Token.*expired|token.*过期|JWT expired",
+      "cause": "用户Token已过期",
+      "solution": "重新获取Token或刷新Token，建议实现Token自动刷新机制",
+      "frequency": "high"
+    },
+    {
+      "pattern": "Invalid token",
+      "regex": "Invalid.*token|token.*无效|JWT invalid",
+      "cause": "Token格式错误或被篡改",
+      "solution": "清除本地Token缓存，重新登录获取新Token",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "Signature verification failed",
+      "regex": "Signature.*verification.*failed|签名验证失败",
+      "cause": "JWT签名验证失败",
+      "solution": "检查JWT密钥配置是否一致，确认Token未被篡改",
+      "frequency": "low"
+    },
+    {
+      "pattern": "Account locked",
+      "regex": "Account.*locked|账号.*锁定|too many attempts",
+      "cause": "账号因多次失败尝试被锁定",
+      "solution": "等待锁定时间过后重试，或联系管理员解锁账号",
+      "frequency": "medium"
+    },
+    {
+      "pattern": "IP not allowed",
+      "regex": "IP.*not.*allowed|IP.*restricted",
+      "cause": "访问IP不在白名单内",
+      "solution": "联系管理员添加IP到白名单，或使用VPN切换IP",
+      "frequency": "low"
+    },
+    {
+      "pattern": "Session expired",
+      "regex": "Session.*expired|会话过期",
+      "cause": "用户会话已过期",
+      "solution": "重新登录系统创建新会话",
+      "frequency": "high"
+    }
+  ],
+  "success_rate": 0.94,
+  "applicable_scenarios": [
+    "所有鉴权失败场景",
+    "API调用返回401 Unauthorized",
+    "用户无法正常登录或操作"
+  ],
+  "expert_tips": [
+    "Token过期是最常见的鉴权问题，优先检查",
+    "检查系统时间是否同步，时间偏差可能导致Token验证失败",
+    "关注账号是否被禁用或锁定",
+    "多因素认证场景需要确认所有认证因素通过"
+  ],
+  "metadata": {
+    "source": "expert_安全工程师",
+    "created_at": "2026-04-20",
+    "last_updated": "2026-04-20",
+    "version": "1.0"
+  }
+}

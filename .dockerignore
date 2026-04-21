@@ -1,0 +1,56 @@
+# ===========================================
+# DRS Agent Backend - Docker Ignore
+# ===========================================
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+.settings
+.project
+.classpath
+
+# Build outputs
+target/
+!target/*.jar
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# Maven
+.m2/
+
+# Documentation
+*.md
+LICENSE
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Environment
+.env
+.env.*
+
+# Test files
+src/test/
+*.test
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
